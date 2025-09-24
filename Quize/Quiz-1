@@ -1,0 +1,367 @@
+--  Create Database
+CREATE DATABASE Company;
+USE Company;
+Drop database Company;
+-- 1. Departments Table
+CREATE TABLE Departments (
+    DeptID INT PRIMARY KEY AUTO_INCREMENT,
+    DeptName VARCHAR(50) NOT NULL,
+    Location VARCHAR(50),
+    ManagerID INT,
+    Extension VARCHAR(10),
+    Budget DECIMAL(12,2),
+    EstablishedYear YEAR,
+    Phone VARCHAR(15),
+    Email VARCHAR(50),
+    Remarks TEXT
+);
+
+INSERT INTO Departments (DeptName, Location, ManagerID, Extension, Budget, EstablishedYear, Phone, Email, Remarks)
+VALUES
+('HR', 'Mumbai', 1, '101', 500000, 2010, '022-1234567', 'hr@company.com', 'Handles recruitment'),
+('Finance', 'Delhi', 2, '102', 1200000, 2008, '011-2345678', 'finance@company.com', 'Manages accounts'),
+('IT', 'Bangalore', 3, '103', 2000000, 2012, '080-3456789', 'it@company.com', 'Software development'),
+('Sales', 'Chennai', 4, '104', 1500000, 2011, '044-4567890', 'sales@company.com', 'Manages clients'),
+('Marketing', 'Pune', 5, '105', 1000000, 2013, '020-5678901', 'marketing@company.com', 'Brand promotion'),
+('Admin', 'Mumbai', 6, '106', 300000, 2009, '022-6789012', 'admin@company.com', 'Support staff'),
+('Operations', 'Hyderabad', 7, '107', 1800000, 2014, '040-7890123', 'operations@company.com', 'Business ops'),
+('Legal', 'Delhi', 8, '108', 800000, 2015, '011-8901234', 'legal@company.com', 'Compliance & legal'),
+('R&D', 'Bangalore', 9, '109', 2200000, 2016, '080-9012345', 'rnd@company.com', 'Research team'),
+('Support', 'Chennai', 10, '110', 700000, 2017, '044-0123456', 'support@company.com', 'Customer support');
+
+-- display table data
+Select * from Departments;
+
+-- to delete values from table 
+truncate table Departments;
+
+-- to delete table
+drop table Departments;
+
+-- 1. Get all departments located in Mumbai
+SELECT * FROM Departments WHERE Location = 'Mumbai';
+
+-- 2. Find departments with budget greater than 1,000,000
+SELECT DeptName, Budget FROM Departments WHERE Budget > 1000000;
+
+-- 3. Departments established between 2010 and 2015
+SELECT DeptName, EstablishedYear FROM Departments WHERE EstablishedYear BETWEEN 2010 AND 2015;
+
+-- 4. Departments in either Delhi or Bangalore
+SELECT DeptName, Location FROM Departments WHERE Location IN ('Delhi', 'Bangalore');
+
+-- 5. Find departments whose name starts with 'M'
+SELECT DeptName FROM Departments WHERE DeptName LIKE 'M%';
+
+-- 6. Departments whose remarks contain the word 'support'
+SELECT DeptName, Remarks FROM Departments WHERE Remarks LIKE '%support%';
+
+-- 7. Total budget allocated to all departments
+SELECT SUM(Budget) AS TotalBudget FROM Departments;
+
+-- 8. Average budget of departments
+SELECT AVG(Budget) AS AvgBudget FROM Departments;
+
+-- 9. Department with maximum budget
+SELECT DeptName, MAX(Budget) AS MaxBudget FROM Departments;
+
+-- 10. Department with minimum budget
+SELECT DeptName, MIN(Budget) AS MinBudget FROM Departments;
+
+-- 11. Count how many departments are located in Chennai
+SELECT COUNT(*) AS ChennaiDepartments FROM Departments WHERE Location = 'Chennai';
+
+-- 12. List employees with their department names (INNER JOIN)
+SELECT E.FirstName, E.LastName, D.DeptName
+FROM Employees E
+INNER JOIN Departments D ON E.DeptID = D.DeptID;
+
+-- 13. Get all departments and their employees (LEFT JOIN - include depts with no employees)
+SELECT D.DeptName, E.FirstName, E.LastName
+FROM Departments D
+LEFT JOIN Employees E ON D.DeptID = E.DeptID;
+
+-- 16. Show total budget per location
+SELECT Location, SUM(Budget) AS TotalBudget
+FROM Departments
+GROUP BY Location;
+
+-- 17. Find number of departments established per year
+SELECT EstablishedYear, COUNT(*) AS DeptCount
+FROM Departments
+GROUP BY EstablishedYear
+ORDER BY DeptCount DESC;
+
+-- 18. Departments grouped by location, only show those with more than 1 department
+SELECT Location, COUNT(*) AS DeptCount
+FROM Departments
+GROUP BY Location
+HAVING COUNT(*) > 1;
+
+-- 2. Employees Table
+CREATE TABLE Employees (
+    EmpID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Gender ENUM('Male','Female','Other'),
+    DOB DATE,
+    HireDate DATE,
+    JobTitle VARCHAR(50),
+    DeptID INT,
+    Email VARCHAR(50) UNIQUE,
+    Phone VARCHAR(15),
+    FOREIGN KEY (DeptID) REFERENCES Departments(DeptID)
+);
+
+INSERT INTO Employees (FirstName, LastName, Gender, DOB, HireDate, JobTitle, DeptID, Email, Phone)
+VALUES
+('Rahul', 'Sharma', 'Male', '1990-05-12', '2015-06-01', 'HR Manager', 1, 'rahul@company.com', '9876543210'),
+('Anita', 'Verma', 'Female', '1988-08-21', '2014-03-15', 'Finance Head', 2, 'anita@company.com', '9876500001'),
+('Kiran', 'Patil', 'Male', '1992-11-10', '2016-09-20', 'Software Engineer', 3, 'kiran@company.com', '9876500002'),
+('Priya', 'Menon', 'Female', '1991-07-25', '2017-01-10', 'Sales Executive', 4, 'priya@company.com', '9876500003'),
+('Vikram', 'Joshi', 'Male', '1985-02-14', '2012-11-05', 'Marketing Lead', 5, 'vikram@company.com', '9876500004'),
+('Rita', 'Nair', 'Female', '1993-12-02', '2018-04-01', 'Admin Officer', 6, 'rita@company.com', '9876500005'),
+('Amit', 'Gupta', 'Male', '1990-09-17', '2016-07-22', 'Operations Analyst', 7, 'amit@company.com', '9876500006'),
+('Sneha', 'Rao', 'Female', '1989-03-30', '2015-08-13', 'Legal Advisor', 8, 'sneha@company.com', '9876500007'),
+('Raj', 'Kapoor', 'Male', '1994-06-05', '2019-02-18', 'Research Scientist', 9, 'raj@company.com', '9876500008'),
+('Neha', 'Desai', 'Female', '1992-01-28', '2020-05-09', 'Support Specialist', 10, 'neha@company.com', '9876500009');
+
+-- display table data
+Select * from Employees;
+
+-- to delete values from table 
+truncate table Employees;
+
+-- to delete table
+drop table Employees;
+
+-- 1. Show all employees
+SELECT * FROM Employees;
+
+-- 2. Find all female employees
+SELECT FirstName, LastName, Gender FROM Employees WHERE Gender = 'Female';
+
+-- 3. Employees hired after 2016
+SELECT FirstName, LastName, HireDate FROM Employees WHERE HireDate > '2016-12-31';
+
+-- 4. Employees born between 1988 and 1992
+SELECT FirstName, LastName, DOB FROM Employees 
+WHERE DOB BETWEEN '1988-01-01' AND '1992-12-31';
+
+-- 5. Employees in IT or HR departments
+SELECT FirstName, LastName, DeptID FROM Employees WHERE DeptID IN (1,3);
+
+-- 6. Employees whose job title contains 'Manager'
+SELECT FirstName, LastName, JobTitle FROM Employees WHERE JobTitle LIKE '%Manager%';
+
+-- 7. Count total employees
+SELECT COUNT(*) AS TotalEmployees FROM Employees;
+
+-- 8. Find the oldest employee (MIN DOB)
+SELECT FirstName, LastName, DOB FROM Employees ORDER BY DOB ASC LIMIT 1;
+
+-- 9. Find the youngest employee (MAX DOB)
+SELECT FirstName, LastName, DOB FROM Employees ORDER BY DOB DESC LIMIT 1;
+
+-- 10. Count employees in each gender category
+SELECT Gender, COUNT(*) AS CountByGender FROM Employees GROUP BY Gender;
+
+-- 11. List employees ordered by hire date (newest first)
+SELECT FirstName, LastName, HireDate FROM Employees ORDER BY HireDate DESC;
+
+-- 12. Show top 3 oldest employees
+SELECT FirstName, LastName, DOB FROM Employees ORDER BY DOB ASC LIMIT 3;
+
+-- 13. Employees grouped by department (count per dept)
+SELECT DeptID, COUNT(*) AS EmployeeCount 
+FROM Employees GROUP BY DeptID;
+
+-- 16. Count employees per location
+SELECT D.Location, COUNT(E.EmpID) AS EmployeeCount
+FROM Departments D
+LEFT JOIN Employees E ON D.DeptID = E.DeptID
+GROUP BY D.Location;
+
+-- 17. List employees along with department budget
+SELECT E.FirstName, E.LastName, D.DeptName, D.Budget
+FROM Employees E
+JOIN Departments D ON E.DeptID = D.DeptID;
+
+-- 18. Find employees with more than 8 years of experience
+SELECT FirstName, LastName, HireDate, 
+       TIMESTAMPDIFF(YEAR, HireDate, CURDATE()) AS YearsExperience
+FROM Employees
+WHERE TIMESTAMPDIFF(YEAR, HireDate, CURDATE()) > 8;
+
+-- 3. Projects Table
+CREATE TABLE Projects (
+    ProjectID INT PRIMARY KEY AUTO_INCREMENT,
+    ProjectName VARCHAR(100) NOT NULL,
+    DeptID INT,
+    StartDate DATE,
+    EndDate DATE,
+    Budget DECIMAL(12,2),
+    Status ENUM('Planned','Ongoing','Completed','On Hold'),
+    ClientID INT,
+    ProjectManager INT,
+    Remarks TEXT,
+    FOREIGN KEY (DeptID) REFERENCES Departments(DeptID)
+);
+
+INSERT INTO Projects (ProjectName, DeptID, StartDate, EndDate, Budget, Status, ClientID, ProjectManager, Remarks)
+VALUES
+('HRMS System', 1, '2021-01-01', '2021-12-31', 600000, 'Completed', 1, 1, 'Employee system'),
+('ERP Finance', 2, '2021-03-15', '2022-05-30', 1500000, 'Ongoing', 2, 2, 'ERP for accounts'),
+('E-Commerce App', 3, '2022-01-10', '2022-12-20', 2000000, 'Ongoing', 3, 3, 'Online platform'),
+('Sales Tracker', 4, '2020-06-05', '2021-06-05', 800000, 'Completed', 4, 4, 'Client sales'),
+('Ad Campaign', 5, '2021-07-01', '2022-01-15', 500000, 'Completed', 5, 5, 'Branding project'),
+('Office Setup', 6, '2019-01-20', '2019-06-30', 350000, 'Completed', 6, 6, 'Admin support'),
+('Logistics System', 7, '2021-09-01', '2022-09-01', 1200000, 'Ongoing', 7, 7, 'Ops management'),
+('Legal Compliance', 8, '2020-03-10', '2020-12-31', 900000, 'Completed', 8, 8, 'Company laws'),
+('AI Research', 9, '2022-02-01', '2023-02-01', 2500000, 'Ongoing', 9, 9, 'Research ML'),
+('Helpdesk Portal', 10, '2021-11-11', '2022-06-30', 750000, 'Completed', 10, 10, 'Support software');
+
+-- display table data
+Select * from Projects;
+
+-- to delete values from table 
+truncate table Projects;
+
+-- to delete table
+drop table Projects;
+
+-- 1. Show all projects that are 'Ongoing'
+SELECT ProjectName, Status FROM Projects WHERE Status = 'Ongoing';
+
+-- 2. Find projects with budget greater than 1,000,000
+SELECT ProjectName, Budget FROM Projects WHERE Budget > 1000000;
+
+-- 3. Projects started between 2021 and 2022
+SELECT ProjectName, StartDate FROM Projects 
+WHERE StartDate BETWEEN '2021-01-01' AND '2022-12-31';
+
+-- 4. Projects handled by departments 1, 2, or 3
+SELECT ProjectName, DeptID FROM Projects WHERE DeptID IN (1,2,3);
+
+-- 5. Projects whose name starts with 'A'
+SELECT ProjectName FROM Projects WHERE ProjectName LIKE 'A%';
+
+-- 6. Projects where remarks contain the word 'system'
+SELECT ProjectName, Remarks FROM Projects WHERE Remarks LIKE '%system%';
+
+-- 7. Total budget of all projects
+SELECT SUM(Budget) AS TotalBudget FROM Projects;
+
+-- 8. Average budget of completed projects
+SELECT AVG(Budget) AS AvgBudget FROM Projects WHERE Status = 'Completed';
+
+-- 9. Find the project with maximum budget
+SELECT ProjectName, Budget FROM Projects ORDER BY Budget DESC LIMIT 1;
+
+-- 10. Find the project with minimum budget
+SELECT ProjectName, Budget FROM Projects ORDER BY Budget ASC LIMIT 1;
+
+-- 11. Count how many projects are ongoing
+SELECT COUNT(*) AS OngoingProjects FROM Projects WHERE Status = 'Ongoing';
+
+-- 12. List all projects ordered by budget (highest first)
+SELECT ProjectName, Budget FROM Projects ORDER BY Budget DESC;
+
+-- 13. List all projects ordered by start date (earliest first)
+SELECT ProjectName, StartDate FROM Projects ORDER BY StartDate ASC;
+
+-- 14. Group projects by status (count each status)
+SELECT Status, COUNT(*) AS ProjectCount FROM Projects GROUP BY Status;
+
+-- 15. Show departments that manage more than 1 project
+SELECT DeptID, COUNT(*) AS ProjectCount
+FROM Projects
+GROUP BY DeptID
+HAVING COUNT(*) > 1;
+
+-- 16. Show project names with their department names
+SELECT P.ProjectName, D.DeptName
+FROM Projects P
+JOIN Departments D ON P.DeptID = D.DeptID;
+
+-- 17. Find all projects managed by the IT department
+SELECT P.ProjectName, D.DeptName
+FROM Projects P
+JOIN Departments D ON P.DeptID = D.DeptID
+WHERE D.DeptName = 'IT';
+
+
+
+-- 4. Salaries Table
+CREATE TABLE Salaries (
+    SalaryID INT PRIMARY KEY AUTO_INCREMENT,
+    EmpID INT,
+    BasicPay DECIMAL(10,2),
+    Allowances DECIMAL(10,2),
+    Deductions DECIMAL(10,2),
+    NetPay DECIMAL(10,2),
+    PayDate DATE,
+    BankName VARCHAR(50),
+    AccountNumber VARCHAR(20),
+    PaymentMode ENUM('Cash','Cheque','Bank Transfer'),
+    FOREIGN KEY (EmpID) REFERENCES Employees(EmpID)
+);
+
+INSERT INTO Salaries (EmpID, BasicPay, Allowances, Deductions, NetPay, PayDate, BankName, AccountNumber, PaymentMode)
+VALUES
+(1, 50000, 10000, 5000, 55000, '2022-01-31', 'SBI', '1234567890', 'Bank Transfer'),
+(2, 70000, 15000, 7000, 78000, '2022-01-31', 'HDFC', '1234567891', 'Bank Transfer'),
+(3, 40000, 8000, 4000, 44000, '2022-01-31', 'ICICI', '1234567892', 'Bank Transfer'),
+(4, 35000, 7000, 3000, 39000, '2022-01-31', 'Axis', '1234567893', 'Cheque'),
+(5, 60000, 12000, 6000, 66000, '2022-01-31', 'Kotak', '1234567894', 'Bank Transfer'),
+(6, 30000, 5000, 2000, 33000, '2022-01-31', 'SBI', '1234567895', 'Cash'),
+(7, 45000, 9000, 4000, 50000, '2022-01-31', 'ICICI', '1234567896', 'Bank Transfer'),
+(8, 55000, 11000, 5000, 61000, '2022-01-31', 'HDFC', '1234567897', 'Bank Transfer'),
+(9, 48000, 10000, 4000, 54000, '2022-01-31', 'Axis', '1234567898', 'Cheque'),
+(10, 32000, 6000, 2000, 36000, '2022-01-31', 'SBI', '1234567899', 'Cash');
+
+-- display table data
+Select * from Salaries;
+
+-- to delete values from table 
+truncate table Salaries;
+
+-- to delete table
+drop table Salaries;
+
+-- 5. Clients Table
+CREATE TABLE Clients (
+    ClientID INT PRIMARY KEY AUTO_INCREMENT,
+    ClientName VARCHAR(100) NOT NULL,
+    Industry VARCHAR(50),
+    Country VARCHAR(50),
+    ContactPerson VARCHAR(50),
+    Email VARCHAR(50),
+    Phone VARCHAR(15),
+    ProjectID INT,
+    ContractValue DECIMAL(12,2),
+    StartDate DATE,
+    FOREIGN KEY (ProjectID) REFERENCES Projects(ProjectID)
+);
+
+INSERT INTO Clients (ClientName, Industry, Country, ContactPerson, Email, Phone, ProjectID, ContractValue, StartDate)
+VALUES
+('Infosys Ltd', 'IT', 'India', 'Ravi Kumar', 'ravi@infosys.com', '9123456780', 1, 800000, '2021-01-01'),
+('TCS', 'Finance', 'India', 'Anjali Singh', 'anjali@tcs.com', '9123456781', 2, 1600000, '2021-03-15'),
+('Amazon', 'E-Commerce', 'USA', 'John Doe', 'john@amazon.com', '9123456782', 3, 2500000, '2022-01-10'),
+('HUL', 'Sales', 'India', 'Priya Agarwal', 'priya@hul.com', '9123456783', 4, 900000, '2020-06-05'),
+('PepsiCo', 'Marketing', 'USA', 'Michael Brown', 'michael@pepsico.com', '9123456784', 5, 600000, '2021-07-01'),
+('WeWork', 'Admin', 'India', 'Siddharth Jain', 'sid@wework.com', '9123456785', 6, 400000, '2019-01-20'),
+('DHL', 'Logistics', 'Germany', 'Hans Muller', 'hans@dhl.com', '9123456786', 7, 1300000, '2021-09-01'),
+('PwC', 'Legal', 'UK', 'Sarah Lee', 'sarah@pwc.com', '9123456787', 8, 950000, '2020-03-10'),
+('Google', 'R&D', 'USA', 'Sundar Pichai', 'sundar@google.com', '9123456788', 9, 2700000, '2022-02-01'),
+('Freshdesk', 'Support', 'India', 'Karthik Kumar', 'karthik@freshdesk.com', '9123456789', 10, 800000, '2021-11-11');
+
+-- display table data
+Select * from Clients;
+
+-- to delete values from table 
+truncate table Clients;
+
+-- to delete table
+drop table Clients;
